@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ContactManager.Server", "Co
 EndProject
 Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "contactmanager.client", "contactmanager.client\contactmanager.client.esproj", "{9393E2D0-F744-42CA-87C5-7A31C4E167DF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ContactManagerDB", "ContactManagerDB\ContactManagerDB.csproj", "{1F0009E3-B677-47A4-9A03-F9B5608284D1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,6 +25,10 @@ Global
 		{9393E2D0-F744-42CA-87C5-7A31C4E167DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9393E2D0-F744-42CA-87C5-7A31C4E167DF}.Release|Any CPU.Build.0 = Release|Any CPU
 		{9393E2D0-F744-42CA-87C5-7A31C4E167DF}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{1F0009E3-B677-47A4-9A03-F9B5608284D1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1F0009E3-B677-47A4-9A03-F9B5608284D1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1F0009E3-B677-47A4-9A03-F9B5608284D1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1F0009E3-B677-47A4-9A03-F9B5608284D1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,3 +1,5 @@
+using ContactManagerDB.Model;
+
 namespace ContactManager.Server
 {
     public class Program
@@ -12,6 +14,7 @@ namespace ContactManager.Server
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+            builder.Services.AddDbContext<ContactDbContext>();
 
             var app = builder.Build();
 
