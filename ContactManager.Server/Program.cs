@@ -1,4 +1,7 @@
+using ContactManager.Server.Extensions;
+using ContactManager.Services.Model.Mapper;
 using ContactManagerDB.Model;
+using Microsoft.EntityFrameworkCore;
 
 namespace ContactManager.Server
 {
@@ -12,9 +15,11 @@ namespace ContactManager.Server
 
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-            builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
-            builder.Services.AddDbContext<ContactDbContext>();
+            builder.Services.AddEndpointsApiExplorer()
+                            .AddSwaggerGen()
+                            .AddDbContext<ContactDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")))
+                            .AddAutoMapper(typeof(ContactMapperProfile))
+                            .AddAppServices();
 
             var app = builder.Build();
 

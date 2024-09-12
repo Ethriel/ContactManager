@@ -10,6 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="13.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.SpaProxy">
       <Version>6.*-*</Version>
     </PackageReference>
@@ -26,6 +27,7 @@
     <ProjectReference Include="..\contactmanager.client\contactmanager.client.esproj">
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
+    <ProjectReference Include="..\ContactManager.Services\ContactManager.Services.csproj" />
     <ProjectReference Include="..\ContactManagerDB\ContactManagerDB.csproj" />
   </ItemGroup>
 
