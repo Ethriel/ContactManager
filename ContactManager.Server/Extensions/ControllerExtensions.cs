@@ -1,6 +1,7 @@
 ﻿using ContactManager.Services.Model.Utility.ApiResult.Abstraction;
 using ContactManager.Services.Model.Utility.ApiResult.Implementation;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace ContactManager.Server.Extensions
 {
@@ -13,11 +14,17 @@ namespace ContactManager.Server.Extensions
                 case ApiResultStatus.Ok:
                     return controller.Ok(apiResult);
                 case ApiResultStatus.NotFound:
-                    logger.LogWarning(((ApiErrorResult)apiResult).LoggerMessage);
+                    logger.LogWarning(message: ((IApiErrorResult)apiResult).LoggerMessage);
                     return controller.NotFound(apiResult);
+                case ApiResultStatus.Conflict:
+                    logger.LogWarning(message: ((IApiErrorResult)apiResult).LoggerMessage);
+                    return controller.Conflict(apiResult);
+                case ApiResultStatus.Empty:
+                    logger.LogInformation(message: apiResult.Message);
+                    return controller.NoContent();
                 case ApiResultStatus.BadRequest:
                 default:
-                    logger.LogError(((ApiErrorResult)apiResult).LoggerMessage);
+                    logger.LogError(message: ((IApiErrorResult)apiResult).LoggerMessage);
                     return controller.BadRequest(apiResult);
             }
         }

@@ -26,7 +26,7 @@ namespace ContactManager.Services.Implementation
             if (existingContact != null)
             {
                 var errorMessage = $"Contact with phone {contactDto.Phone} already exists!";
-                return new ApiErrorResult(ApiResultStatus.BadRequest, errorMessage, errorMessage, new string[] { errorMessage });
+                return new ApiErrorResult(ApiResultStatus.Conflict, errorMessage, errorMessage, new string[] { errorMessage });
             }
 
             var contactToAdd = contactMapperService.MapContact(contactDto);
@@ -150,9 +150,21 @@ namespace ContactManager.Services.Implementation
             var contacts = contactService.Read();
             var contactDtos = contactMapperService.MapContactDtos(contacts);
             var contactsByCondition = contactDtos.Where(condition);
-            var message = (contactsByCondition != null && contactsByCondition.Any()) ? "Success" : "There are no contacts by a given condition";
+            var result = default(IApiResult);
+            var message = default(string);
 
-            return new ApiOkResult(ApiResultStatus.Ok, message, contactsByCondition);
+            if (contactsByCondition != null && contactsByCondition.Any())
+            {
+                message = "Success";
+                result = new ApiOkResult(ApiResultStatus.Ok, message, contactsByCondition);
+            }
+            else
+            {
+                message = "There are no contacts by a given condition";
+                result = new ApiErrorResult(ApiResultStatus.NotFound, message, message, new string[] { message });
+            }
+
+            return result;
         }
 
         public async Task<IApiResult> GetContactsByConditionAsync(Func<ContactDto, bool> condition)
@@ -163,17 +175,37 @@ namespace ContactManager.Services.Implementation
         public IApiResult GetContactsFromFile(IFormFile file)
         {
             var result = default(IApiResult);
+            var errorMessage = "Could not get contacts from file";
 
             var contactDtosFromFile = csvService.ReadFromStream(file.OpenReadStream());
 
             if (contactDtosFromFile == null || !contactDtosFromFile.Any())
             {
-                var errorMessage = "Could not get contacts from file";
                 result = new ApiErrorResult(ApiResultStatus.BadRequest, errorMessage, errorMessage, new string[] { errorMessage });
             }
             else
             {
-                result = new ApiOkResult(ApiResultStatus.Ok, "Successfully got contacts from file", contactDtosFromFile);
+                var addContactResult = default(IApiResult);
+                var skippedContacts = 0;
+
+                foreach (var contactToAdd in contactDtosFromFile)
+                {
+                    addContactResult = AddContact(contactToAdd);
+
+                    // One or more contacts may already be in the DB, just skip them
+                    if (addContactResult is IApiErrorResult && (addContactResult as IApiErrorResult).ApiResultStatus == ApiResultStatus.Conflict)
+                        skippedContacts++;
+                }
+
+                // All contacts from CSV are already in the DB
+                if (skippedContacts == contactDtosFromFile.Count())
+                {
+                    result = new ApiErrorResult(ApiResultStatus.Conflict, errorMessage, errorMessage, new string[] { errorMessage });
+                }
+                else
+                {
+                    result = new ApiOkResult(ApiResultStatus.Empty, "Successfully got contacts from file");
+                }
             }
 
             return result;
@@ -219,7 +251,7 @@ namespace ContactManager.Services.Implementation
             if (contacts == null || !contacts.Any())
             {
                 var errorMessage = $"Could not get contacts";
-                result = new ApiErrorResult(ApiResultStatus.BadRequest, errorMessage, errorMessage, new string[] { errorMessage });
+                result = new ApiErrorResult(ApiResultStatus.Empty, errorMessage, errorMessage, new string[] { errorMessage });
             }
             else
             {

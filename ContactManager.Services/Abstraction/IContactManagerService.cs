@@ -1,7 +1,6 @@
 ﻿using ContactManager.Services.Model.DTO;
 using ContactManager.Services.Model.Utility.ApiResult.Abstraction;
 using Microsoft.AspNetCore.Http;
-using System.Linq.Expressions;
 
 namespace ContactManager.Services.Abstraction
 {

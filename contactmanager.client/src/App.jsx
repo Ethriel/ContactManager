@@ -1,48 +1,101 @@
 import { useEffect, useState } from 'react';
 import './App.css';
+import { ApiRoutes } from './constants/api-routes';
+import { ImageUploader } from './components/image-uploader';
+import axios from 'axios';
+import makeRequestAsync from './utilities/make-request-async';
 
 function App() {
-    const [forecasts, setForecasts] = useState();
 
     useEffect(() => {
-        populateWeatherData();
+        populateContactsData();
     }, []);
 
-    const contents = forecasts === undefined
-        ? <p><em>Loading... Please refresh once the ASP.NET backend has started. See <a href="https://aka.ms/jspsintegrationreact">https://aka.ms/jspsintegrationreact</a> for more details.</em></p>
-        : <table className="table table-striped" aria-labelledby="tableLabel">
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Temp. (C)</th>
-                    <th>Temp. (F)</th>
-                    <th>Summary</th>
-                </tr>
-            </thead>
-            <tbody>
-                {forecasts.map(forecast =>
-                    <tr key={forecast.date}>
-                        <td>{forecast.date}</td>
-                        <td>{forecast.temperatureC}</td>
-                        <td>{forecast.temperatureF}</td>
-                        <td>{forecast.summary}</td>
-                    </tr>
-                )}
-            </tbody>
-        </table>;
+    const [loading, setLoading] = useState(false);
+    const [contacts, setContacts] = useState();
+    const [selectedFile, setSelectedFile] = useState({});
+    const [fileSelected, setFileSelected] = useState(false);
 
+    const onFileChange = event => {
+        const file = event.target.files[0];
+        setSelectedFile(file);
+        setFileSelected(true);
+    }
+
+    const onFileUpload = async () => {
+        const signal = axios.CancelToken.source();
+        try {
+            setLoading(true);
+            const formData = new FormData();
+
+            formData.set(
+                "csv",
+                selectedFile,
+                selectedFile.name
+            );
+
+            const response = await makeRequestAsync(ApiRoutes.uploadCsv, signal.token, formData, "post");
+            const apiResult = response.data;
+            console.log(apiResult);
+            populateContactsData();
+        } catch (error) {
+            console.log(error);
+        }
+        finally {
+            setLoading(false);
+        }
+    }
+    
     return (
         <div>
-            <h1 id="tableLabel">Weather forecast</h1>
-            <p>This component demonstrates fetching data from the server.</p>
-            {contents}
+            <h1 id="tableLabel">Contacts manager</h1>
+            <div>
+                <h2>Upload CSV</h2>
+                <ImageUploader fileSelected={fileSelected} onFileChange={onFileChange} onFileUpload={onFileUpload} />
+            </div>
+            <h2 id="tableLabel">Contacts list</h2>
+
+            {loading && <p><em>Loading...</em></p>}
+            {(!loading && (contacts === undefined || contacts.length === 0)) && <p><em>No contacts to show</em></p>}
+            {!loading && (contacts !== undefined && contacts.length !== 0) &&
+                <table className="table table-striped" aria-labelledby="tableLabel">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Date of birth</th>
+                            <th>Married</th>
+                            <th>Phone</th>
+                            <th>Salary</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {contacts.map(contact =>
+                            <tr key={contact.id} id={'contactId'.concat(contact.id)}>
+                                <td>{contact.name}</td>
+                                <td>{contact.dateOfBirth}</td>
+                                <td>{contact.married ? 'Yes' : 'No'}</td>
+                                <td>{contact.phone}</td>
+                                <td>{contact.salary}</td>
+                            </tr>
+                        )}
+                    </tbody>
+                </table>}
         </div>
     );
-    
-    async function populateWeatherData() {
-        const response = await fetch('weatherforecast');
-        const data = await response.json();
-        setForecasts(data);
+
+    async function populateContactsData() {
+        try {
+            setLoading(true);
+            const signal = axios.CancelToken.source();
+            const response = await makeRequestAsync(ApiRoutes.listContacts, signal.token);
+            const apiResult = response.data;
+            setContacts(apiResult.data);
+        } catch (error) {
+            console.log(error)
+        }
+        finally {
+            setLoading(false);
+        }
     }
 }
 

@@ -1,0 +1,15 @@
+C:\Users\Kerfoer\source\repos\ContactManager\ContactManagerDB\bin\Debug\net6.0\ContactManagerDB.deps.json
+C:\Users\Kerfoer\source\repos\ContactManager\ContactManagerDB\bin\Debug\net6.0\ContactManagerDB.runtimeconfig.json
+C:\Users\Kerfoer\source\repos\ContactManager\ContactManagerDB\bin\Debug\net6.0\ContactManagerDB.dll
+C:\Users\Kerfoer\source\repos\ContactManager\ContactManagerDB\bin\Debug\net6.0\ContactManagerDB.pdb
+C:\Users\Kerfoer\source\repos\ContactManager\ContactManagerDB\obj\Debug\net6.0\ContactManagerDB.csproj.AssemblyReference.cache
+C:\Users\Kerfoer\source\repos\ContactManager\ContactManagerDB\obj\Debug\net6.0\ContactManagerDB.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Kerfoer\source\repos\ContactManager\ContactManagerDB\obj\Debug\net6.0\ContactManagerDB.AssemblyInfoInputs.cache
+C:\Users\Kerfoer\source\repos\ContactManager\ContactManagerDB\obj\Debug\net6.0\ContactManagerDB.AssemblyInfo.cs
+C:\Users\Kerfoer\source\repos\ContactManager\ContactManagerDB\obj\Debug\net6.0\ContactManagerDB.csproj.CoreCompileInputs.cache
+C:\Users\Kerfoer\source\repos\ContactManager\ContactManagerDB\obj\Debug\net6.0\ContactManagerDB.sourcelink.json
+C:\Users\Kerfoer\source\repos\ContactManager\ContactManagerDB\obj\Debug\net6.0\ContactManagerDB.dll
+C:\Users\Kerfoer\source\repos\ContactManager\ContactManagerDB\obj\Debug\net6.0\refint\ContactManagerDB.dll
+C:\Users\Kerfoer\source\repos\ContactManager\ContactManagerDB\obj\Debug\net6.0\ContactManagerDB.pdb
+C:\Users\Kerfoer\source\repos\ContactManager\ContactManagerDB\obj\Debug\net6.0\ContactManagerDB.genruntimeconfig.cache
+C:\Users\Kerfoer\source\repos\ContactManager\ContactManagerDB\obj\Debug\net6.0\ref\ContactManagerDB.dll

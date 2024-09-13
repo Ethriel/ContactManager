@@ -1,5 +1,6 @@
 ﻿using ContactManager.Services.Abstraction;
 using CsvHelper;
+using CsvHelper.Configuration;
 using System.Globalization;
 
 namespace ContactManager.Services.Implementation
@@ -15,10 +16,17 @@ namespace ContactManager.Services.Implementation
         {
             using (var reader = new StreamReader(stream))
             {
-                using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
+                var csvConfig = new CsvConfiguration(CultureInfo.InvariantCulture)
+                {
+                    AllowComments = true,
+                    HeaderValidated = null,
+                    MissingFieldFound = null
+                };
+
+                using (var csv = new CsvReader(reader, csvConfig))
                 {
                     var records = csv.GetRecords<TEntity>();
-                    return records;
+                    return records.ToArray();
                 }
             }
         }

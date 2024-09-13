@@ -6,7 +6,9 @@ namespace ContactManager.Services.Model.Utility.ApiResult.Abstraction
     {
         Ok,
         NotFound,
-        BadRequest
+        BadRequest,
+        Conflict,
+        Empty
     }
 
     public interface IApiResult

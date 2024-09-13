@@ -1,5 +1,7 @@
 ﻿using ContactManager.Services.Abstraction;
 using ContactManager.Services.Implementation;
+using ContactManagerDB.Model;
+using Microsoft.EntityFrameworkCore;
 
 namespace ContactManager.Server.Extensions
 {
@@ -7,7 +9,8 @@ namespace ContactManager.Server.Extensions
     {
         public static IServiceCollection AddAppServices(this IServiceCollection services)
         {
-            return services.AddScoped(typeof(ICsvService<>), typeof(CsvService<>))
+            return services.AddScoped<DbContext, ContactDbContext>()
+                           .AddScoped(typeof(ICsvService<>), typeof(CsvService<>))
                            .AddScoped<IContactCrudService, ContactCrudService>()
                            .AddScoped<IContactCrudExtendedService, ContactCrudExtendedService>()
                            .AddScoped<IMapperService, MapperService>()
