@@ -63,7 +63,7 @@ namespace ContactManager.Services.Implementation
 
             if (contactToUpdate != null)
             {
-                contactToUpdate = UpdateHelper<Contact>.Update(_dbContext.Model, contactToUpdate, newContactData);
+                contactToUpdate = UpdateUtility<Contact>.Update(_dbContext.Model, contactToUpdate, newContactData);
                 return ConfirmChanges() > 0;
             }
             else

@@ -21,25 +21,28 @@ namespace ContactManager.Services.Implementation
         public IApiResult AddContact(ContactDto contactDto)
         {
             var result = default(IApiResult);
-            var existingContact = contactService.ReadByCondition(x => x.Phone == contactDto.Phone || x.Id == contactDto.Id);
+            var existingContact = contactService.ReadByCondition(c => c.Phone == contactDto.Phone);
+            var errorMessage = string.Empty;
 
             if (existingContact != null)
             {
-                var errorMessage = $"Contact with phone {contactDto.Phone} already exists!";
-                return new ApiErrorResult(ApiResultStatus.Conflict, errorMessage, errorMessage, new string[] { errorMessage });
-            }
-
-            var contactToAdd = contactMapperService.MapContact(contactDto);
-            var createResult = contactService.Create(contactToAdd);
-
-            if (!createResult)
-            {
-                var errorMessage = "An error occurred while creating a new contact";
-                result = new ApiErrorResult(ApiResultStatus.BadRequest, errorMessage, errorMessage);
+                errorMessage = $"Contact with phone ({contactDto.Phone}) already exists!";
+                result = new ApiErrorResult(ApiResultStatus.Conflict, errorMessage, errorMessage, new string[] { errorMessage });
             }
             else
             {
-                result = new ApiOkResult(ApiResultStatus.Ok, "Success");
+                var contactToAdd = contactMapperService.MapContact(contactDto);
+                var isContactCreated = contactService.Create(contactToAdd);
+
+                if (!isContactCreated)
+                {
+                    errorMessage = "An error occurred while creating a new contact";
+                    result = new ApiErrorResult(ApiResultStatus.BadRequest, errorMessage, errorMessage);
+                }
+                else
+                {
+                    result = new ApiOkResult(ApiResultStatus.NoContent, "Success");
+                }
             }
 
             return result;
@@ -50,56 +53,20 @@ namespace ContactManager.Services.Implementation
             return await Task.Run(() => AddContact(contactDto));
         }
 
-        public IApiResult CreateContactsFromFile(IFormFile file)
+        public IApiResult DeleteContact(object id)
         {
             var result = default(IApiResult);
+            var existingContact = contactService.ReadById(id);
 
-            var contactDtosFromFile = csvService.ReadFromStream(file.OpenReadStream());
-
-            if (contactDtosFromFile == null || !contactDtosFromFile.Any())
+            if (existingContact == null)
             {
-                var errorMessage = "Could not create contacts from file";
-                result = new ApiErrorResult(ApiResultStatus.BadRequest, errorMessage, errorMessage, new string[] { errorMessage });
-            }
-            else
-            {
-                var createResult = default(IApiResult);
-
-                foreach (var contact in contactDtosFromFile)
-                {
-                    createResult = AddContact(contact);
-
-                    if (createResult.ApiResultStatus != ApiResultStatus.Ok)
-                    {
-                        return createResult;
-                    }
-                }
-
-                result = new ApiOkResult(ApiResultStatus.Ok, "Successfully created contacts from file");
-            }
-
-            return result;
-        }
-
-        public async Task<IApiResult> CreateContactsFromFileAsync(IFormFile file)
-        {
-            return await Task.FromResult(CreateContactsFromFile(file));
-        }
-
-        public IApiResult DeleteContact(ContactDto contactDto)
-        {
-            var result = default(IApiResult);
-            var existingContact = contactService.ReadById(contactDto.Id);
-
-            if (existingContact != null)
-            {
-                var loggerMessage = $"Contact (Id = {contactDto.Id}) does not exist!";
+                var loggerMessage = $"Contact (Id = {id}) does not exist!";
                 var errorMessage = "Contact does not exist!";
                 result = new ApiErrorResult(ApiResultStatus.NotFound, errorMessage, errorMessage, new string[] { errorMessage });
             }
             else
             {
-                var deleteResult = contactService.Delete(contactDto.Id);
+                var deleteResult = contactService.Delete(id);
 
                 if (!deleteResult)
                 {
@@ -108,16 +75,16 @@ namespace ContactManager.Services.Implementation
                 }
                 else
                 {
-                    result = new ApiOkResult(ApiResultStatus.Ok, "Success");
+                    result = new ApiOkResult(ApiResultStatus.NoContent, "Success");
                 }
             }
 
             return result;
         }
 
-        public async Task<IApiResult> DeleteContactAsync(ContactDto contactDto)
+        public async Task<IApiResult> DeleteContactAsync(object id)
         {
-            return await Task.FromResult(DeleteContact(contactDto));
+            return await Task.FromResult(DeleteContact(id));
         }
 
         public IApiResult GetContactById(object id)
@@ -172,10 +139,10 @@ namespace ContactManager.Services.Implementation
             return await Task.FromResult(GetContactsByCondition(condition));
         }
 
-        public IApiResult GetContactsFromFile(IFormFile file)
+        public IApiResult CreateContactsFromFile(IFormFile file)
         {
             var result = default(IApiResult);
-            var errorMessage = "Could not get contacts from file";
+            var errorMessage = "Could not get contacts from file.";
 
             var contactDtosFromFile = csvService.ReadFromStream(file.OpenReadStream());
 
@@ -192,28 +159,35 @@ namespace ContactManager.Services.Implementation
                 {
                     addContactResult = AddContact(contactToAdd);
 
-                    // One or more contacts may already be in the DB, just skip them
-                    if (addContactResult is IApiErrorResult && (addContactResult as IApiErrorResult).ApiResultStatus == ApiResultStatus.Conflict)
-                        skippedContacts++;
+                    if (addContactResult is IApiErrorResult)
+                    {
+                        // A contact may already be in the DB, just skip it
+                        if (addContactResult.ApiResultStatus == ApiResultStatus.Conflict)
+                            skippedContacts++;
+                        // An error occured while adding a contact, abort operation
+                        else if (addContactResult.ApiResultStatus == ApiResultStatus.BadRequest)
+                            return new ApiErrorResult(ApiResultStatus.BadRequest, errorMessage, errorMessage, new string[] { errorMessage });
+                    }
                 }
 
                 // All contacts from CSV are already in the DB
                 if (skippedContacts == contactDtosFromFile.Count())
                 {
-                    result = new ApiErrorResult(ApiResultStatus.Conflict, errorMessage, errorMessage, new string[] { errorMessage });
+                    var noNewContactsErrorMessage = "No new contacts detected!";
+                    result = new ApiErrorResult(ApiResultStatus.Conflict, noNewContactsErrorMessage, noNewContactsErrorMessage, new string[] { errorMessage, noNewContactsErrorMessage });
                 }
                 else
                 {
-                    result = new ApiOkResult(ApiResultStatus.Empty, "Successfully got contacts from file");
+                    result = new ApiOkResult(ApiResultStatus.NoContent, "Successfully got contacts from file");
                 }
             }
 
             return result;
         }
 
-        public async Task<IApiResult> GetContactsFromFileAsync(IFormFile file)
+        public async Task<IApiResult> CreateContactsFromFileAsync(IFormFile file)
         {
-            return await Task.FromResult(GetContactsFromFile(file));
+            return await Task.FromResult(CreateContactsFromFile(file));
         }
 
         public IApiResult GetPortion(int skip, int take)
@@ -251,7 +225,7 @@ namespace ContactManager.Services.Implementation
             if (contacts == null || !contacts.Any())
             {
                 var errorMessage = $"Could not get contacts";
-                result = new ApiErrorResult(ApiResultStatus.Empty, errorMessage, errorMessage, new string[] { errorMessage });
+                result = new ApiErrorResult(ApiResultStatus.NoContent, errorMessage, errorMessage, new string[] { errorMessage });
             }
             else
             {
@@ -292,7 +266,7 @@ namespace ContactManager.Services.Implementation
                 }
                 else
                 {
-                    result = new ApiOkResult(ApiResultStatus.Ok, "Success");
+                    result = new ApiOkResult(ApiResultStatus.NoContent, "Contact updated");
                 }
             }
 

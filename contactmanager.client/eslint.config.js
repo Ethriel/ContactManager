@@ -33,6 +33,8 @@ export default [
         'warn',
         { allowConstantExport: true },
       ],
+      "react/no-unknown-property": ["error", { ignore: ["jsx"] }],
+      "react/prop-types": 0
     },
   },
 ]

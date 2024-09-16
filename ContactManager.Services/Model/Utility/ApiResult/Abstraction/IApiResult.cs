@@ -8,7 +8,7 @@ namespace ContactManager.Services.Model.Utility.ApiResult.Abstraction
         NotFound,
         BadRequest,
         Conflict,
-        Empty
+        NoContent
     }
 
     public interface IApiResult

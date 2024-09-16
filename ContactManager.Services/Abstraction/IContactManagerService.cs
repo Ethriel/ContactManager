@@ -14,12 +14,10 @@ namespace ContactManager.Services.Abstraction
         Task<IApiResult> ListContactsAsync();
         IApiResult GetPortion(int skip, int take);
         Task<IApiResult> GetPortionAsync(int skip, int take);
-        IApiResult DeleteContact(ContactDto contactDto);
-        Task<IApiResult> DeleteContactAsync(ContactDto contactDto);
+        IApiResult DeleteContact(object id);
+        Task<IApiResult> DeleteContactAsync(object id);
         IApiResult UpdateContact(ContactDto contactDto);
         Task<IApiResult> UpdateContactAsync(ContactDto contactDto);
-        IApiResult GetContactsFromFile(IFormFile file);
-        Task<IApiResult> GetContactsFromFileAsync(IFormFile file);
         IApiResult CreateContactsFromFile(IFormFile file);
         Task<IApiResult> CreateContactsFromFileAsync(IFormFile file);
         IApiResult GetContactsByCondition(Func<ContactDto, bool> condition);

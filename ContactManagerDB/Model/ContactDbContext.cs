@@ -27,6 +27,14 @@ namespace ContactManagerDB.Model
 
             modelBuilder.Entity<Contact>()
                         .HasKey(x => x.Id);
+
+            modelBuilder.Entity<Contact>()
+                        .HasIndex(x => x.Phone)
+                        .IsUnique();
+
+            modelBuilder.Entity<Contact>()
+                        .Property(x => x.Salary)
+                        .HasPrecision(18, 2);
         }
     }
 }

@@ -1,14 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata;
-using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ContactManager.Services.Model.Utility
 {
-    public class UpdateHelper<T> where T : class
+    public class UpdateUtility<T> where T : class
     {
         /// <summary>
         /// Update values of properties of <paramref name="oldEntity"/> with new values of properties of <paramref name="newEntity"/>
@@ -58,17 +53,18 @@ namespace ContactManager.Services.Model.Utility
         /// <returns></returns>
         private static Type UnProxy(IModel model, Type type)
         {
+            var originalType = default(Type);
+
             // get all entity types from db context
             var entityTypes = model.GetEntityTypes();
-            Type originalType = null;
+
             foreach (var entityType in entityTypes)
             {
                 originalType = entityType.ClrType;
                 if (originalType.Name.Equals(type.Name))
-                {
                     break;
-                }
             }
+
             return originalType;
         }
     }
