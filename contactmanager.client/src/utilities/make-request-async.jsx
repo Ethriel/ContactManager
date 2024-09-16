@@ -12,7 +12,7 @@ const makeRequestAsync = async (
   const requestUrl = ApiRoutes.root.concat(urlTail)
   axios.defaults.withCredentials = false
   const axiosConfig =
-    (postData === null && parameters !== null)
+    postData === null && parameters !== null
       ? {
           method: method,
           params: parameters,
